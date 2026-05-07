@@ -7,15 +7,16 @@ import scipy.stats as stats
 sns.set_theme(style="whitegrid")
 
 df = sns.load_dataset("penguins")
-
-print(df.head(8))
-print(df.info())
+print(df.describe().round(2))
 
 
-print(df.isnull().sum())
+cols = ["body_mass_g","bill_length_mm","bill_depth_mm","flipper_length_mm"]
 
+summary = df.groupby("species")[cols].agg(
+    ["mean","median","std"]).round(2)
+print(summary)
 
-print(df["species"].value_counts())
-
-# Čišćenje
-df = df.dropna()
+#kof varijacije
+cv = df.groupby("species")["body_mass_g"].agg(
+    lambda x: (x.std() / x.mean() * 100).round(2))
+print("KV (%):", cv)
