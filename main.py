@@ -7,16 +7,22 @@ import scipy.stats as stats
 sns.set_theme(style="whitegrid")
 
 df = sns.load_dataset("penguins")
-print(df.describe().round(2))
+sns.histplot(df["flipper_length_mm"], bins=20, kde=True)
+plt.show()
 
 
-cols = ["body_mass_g","bill_length_mm","bill_depth_mm","flipper_length_mm"]
+sns.histplot(df, x="flipper_length_mm", hue="species", kde=True)
+plt.show()
 
-summary = df.groupby("species")[cols].agg(
-    ["mean","median","std"]).round(2)
-print(summary)
 
-#kof varijacije
-cv = df.groupby("species")["body_mass_g"].agg(
-    lambda x: (x.std() / x.mean() * 100).round(2))
-print("KV (%):", cv)
+fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+mjere = ["bill_length_mm","bill_depth_mm",
+         "flipper_length_mm","body_mass_g"]
+
+for ax, col in zip(axes.flat, mjere):
+    sns.violinplot(data=df, x="species", y=col, ax=ax)
+    ax.set_title(col.replace("_", " "))
+
+plt.suptitle("Mjere pingvina po vrsti")
+plt.tight_layout()
+plt.show()
