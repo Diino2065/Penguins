@@ -4,23 +4,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 
-sns.set_theme(style="whitegrid")
+
+#razlika
+(sns.set_theme(style="whitegrid"))
 
 df = sns.load_dataset("penguins")
-r, p = stats.pearsonr(
-    df["flipper_length_mm"], df["body_mass_g"])
-print(f"r = {r:.3f}, p = {p:.4f}")
+adelie = df[df["species"]=="Adelie"]["flipper_length_mm"]
+chinstrap = df[df["species"]=="Chinstrap"]["flipper_length_mm"]
 
 
-fig, ax = plt.subplots(figsize=(7, 5))
-sns.regplot(data=df, x="flipper_length_mm",
-            y="body_mass_g", ax=ax, scatter=False, color="gray")
-sns.scatterplot(data=df, x="flipper_length_mm",
-                y="body_mass_g", hue="species", ax=ax)
+t, p = stats.ttest_ind(adelie, chinstrap)
+print(f"t = {t:.3f}, p = {p:.4f}")
 
 
-corr = df.corr(numeric_only=True)
-sns.heatmap(corr, annot=True, cmap="coolwarm", vmin=-1, vmax=1)
+zajednicki = np.sqrt((adelie.std()**2 + chinstrap.std()**2) / 2)
+d = (adelie.mean() - chinstrap.mean()) / zajednicki
+print(f"Cohenov d = {d:.3f}")
 
-# Pair plot
-sns.pairplot(df, hue="species", diag_kind="kde")
+
+sns.barplot(data=df, x="species", y="flipper_length_mm", capsize=0.1)
+plt.title("Srednja duljina peraje po vrsti (95% CI)")
+plt.show()
