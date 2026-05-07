@@ -7,22 +7,20 @@ import scipy.stats as stats
 sns.set_theme(style="whitegrid")
 
 df = sns.load_dataset("penguins")
-sns.histplot(df["flipper_length_mm"], bins=20, kde=True)
-plt.show()
+r, p = stats.pearsonr(
+    df["flipper_length_mm"], df["body_mass_g"])
+print(f"r = {r:.3f}, p = {p:.4f}")
 
 
-sns.histplot(df, x="flipper_length_mm", hue="species", kde=True)
-plt.show()
+fig, ax = plt.subplots(figsize=(7, 5))
+sns.regplot(data=df, x="flipper_length_mm",
+            y="body_mass_g", ax=ax, scatter=False, color="gray")
+sns.scatterplot(data=df, x="flipper_length_mm",
+                y="body_mass_g", hue="species", ax=ax)
 
 
-fig, axes = plt.subplots(2, 2, figsize=(12, 8))
-mjere = ["bill_length_mm","bill_depth_mm",
-         "flipper_length_mm","body_mass_g"]
+corr = df.corr(numeric_only=True)
+sns.heatmap(corr, annot=True, cmap="coolwarm", vmin=-1, vmax=1)
 
-for ax, col in zip(axes.flat, mjere):
-    sns.violinplot(data=df, x="species", y=col, ax=ax)
-    ax.set_title(col.replace("_", " "))
-
-plt.suptitle("Mjere pingvina po vrsti")
-plt.tight_layout()
-plt.show()
+# Pair plot
+sns.pairplot(df, hue="species", diag_kind="kde")
